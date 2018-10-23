@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- Advice definition -->
+	<bean id="beforeAdvice1"
+		class="kame.spring.chap03.api.OrderBeforeAdvice" p:name="1" />
+
+	<bean id="beforeAdvice2"
+		class="kame.spring.chap03.api.OrderBeforeAdvice" p:name="2" />
+
+	<bean id="beforeAdvice3"
+		class="kame.spring.chap03.api.OrderBeforeAdvice" p:name="3" />
+
+	<bean id="afterAdvice1"
+		class="kame.spring.chap03.api.OrderReturningAdvice" p:name="1" />
+
+	<bean id="afterAdvice2"
+		class="kame.spring.chap03.api.OrderReturningAdvice" p:name="2" />
+
+	<bean id="afterAdvice3"
+		class="kame.spring.chap03.api.OrderReturningAdvice" p:name="3" />
+
+	<bean id="interceptorAdvice1"
+		class="kame.spring.chap03.api.OrderInterceptorAdvice" p:name="1" />
+	
+	<bean id="interceptorAdvice2"
+		class="kame.spring.chap03.api.OrderInterceptorAdvice" p:name="2" />
+	
+	<bean id="interceptorAdvice3"
+		class="kame.spring.chap03.api.OrderInterceptorAdvice" p:name="3" />
+
+	<!-- target definition -->
+	<bean id="writeArticleServiceTarget"
+		class="kame.spring.chap03.core.WriteArticleServiceImpl" />
+
+	<!-- proxy definition -->
+	<bean id="writeArticleService"
+		class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="writeArticleServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>beforeAdvice1</value>
+				<value>beforeAdvice2</value>
+				<value>beforeAdvice3</value>
+				<value>interceptorAdvice1</value>
+				<value>interceptorAdvice2</value>
+				<value>interceptorAdvice3</value>
+				<value>afterAdvice1</value>
+				<value>afterAdvice2</value>
+				<value>afterAdvice3</value>
+			</list>
+		</property>
+	</bean>
+</beans>

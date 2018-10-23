@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- target definition -->
+	<bean id="writeArticleServiceTarget"
+		class="kame.spring.chap03.core.WriteArticleServiceImpl" />
+
+	<bean id="readArticleServiceTarget"
+		class="kame.spring.chap03.core.ReadArticleServiceImpl" />
+	
+	<bean id="searchServiceTarget"
+		class="kame.spring.chap03.core.SearchService" />
+
+	<!-- Advice definition -->
+	<bean id="beforeLogAdvice"
+		class="kame.spring.chap03.api.MethodBeforeLogAdvice" />
+
+	<bean id="afterLogAdvice"
+		class="kame.spring.chap03.api.AfterReturningLogAdvice" />
+
+	<bean id="interceptorLogAdvice"
+		class="kame.spring.chap03.api.MethodInterceptorLogAdvice" />
+
+	<bean id="cacheAdvice"
+		class="kame.spring.chap03.api.CacheInterceptor" />
+
+	<!-- pointcut and advisor definition -->
+	<bean id="writePointcut"
+		class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+		<property name="pattern" value=".*write.*" />
+	</bean>
+
+	<bean id="readPointcut"
+		class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+		<property name="patterns">
+			<list>
+				<value>.*readArticle.*</value>
+				<value>.*readComment.*</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="getPointcut"
+		class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+		<property name="expression" value="execution(public !void get*(..))" />
+	</bean>
+
+	<bean id="writeAdvisor"
+		class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="beforeLogAdvice" />
+		<property name="pointcut" ref="writePointcut" />
+	</bean>
+
+	<bean id="readAdvisor"
+		class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="cacheAdvice" />
+		<property name="pointcut" ref="readPointcut" />
+	</bean>
+
+	<bean id="getAdvisor"
+		class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="cacheAdvice" />
+		<property name="pointcut" ref="getPointcut" />
+	</bean>
+
+	<!-- 
+	<bean id="getAdvisor"
+		class="org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
+		<property name="advice" ref="cacheAdvice" />
+		<property name="expression" value="execution(public !void get*(..))" />
+	</bean>
+	-->
+
+	<!-- proxy definition -->
+	<bean id="writeArticleService"
+		class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="writeArticleServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>writeAdvisor</value>
+				<value>afterLogAdvice</value>
+				<value>interceptorLogAdvice</value>
+			</list>
+		</property>
+		<property name="proxyInterfaces">
+			<list>
+				<value>
+					kame.spring.chap03.core.WriteArticleService
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="readArticleService"
+		class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="readArticleServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>readAdvisor</value>
+			</list>
+		</property>
+		<property name="proxyInterfaces">
+			<list>
+				<value>
+					kame.spring.chap03.core.ReadArticleService
+				</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="getBoardService"
+		class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean class="kame.spring.chap03.core.GetBoardServiceImpl" />
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>getAdvisor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="searchService"
+		class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="searchServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>interceptorLogAdvice</value>
+			</list>
+		</property>
+	</bean>
+</beans>

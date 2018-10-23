@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+
+	<!-- target definition -->
+	<bean id="writeArticleService"
+		class="kame.spring.chap03.core.WriteArticleServiceImpl" />
+
+	<bean id="readArticleService"
+		class="kame.spring.chap03.core.ReadArticleServiceImpl" />
+
+	<!-- Advice definition -->
+	<bean id="beforeLogAdvice"
+		class="kame.spring.chap03.api.MethodBeforeLogAdvice" />
+
+	<bean id="beforeLogAdvisor"
+		class="org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
+		<property name="advice" ref="beforeLogAdvice" />
+		<property name="expression" value="execution(public * *(..))" />
+	</bean>
+</beans>

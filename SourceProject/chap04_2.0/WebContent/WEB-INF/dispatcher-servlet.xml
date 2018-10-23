@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="internalSearchService"
+		class="kame.spring.chap04.controller.InternalSearchService">
+	</bean>
+	<bean id="externalSearchService"
+		class="kame.spring.chap04.controller.ExternalSearchService">
+	</bean>
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+
+	<bean id="handlerMapping2"
+		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="order" value="2" />
+		<property name="alwaysUseFullPath" value="true" />
+	</bean>
+
+	<bean id="handlerMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="1" />
+		<property name="alwaysUseFullPath" value="true" />
+		<property name="mappings">
+			<props>
+				<prop key="/content/**/*.htm">contentController</prop>
+				<prop key="/greeting/hello.htm">helloController</prop>
+				<prop key="/login.do">loginController</prop>
+				<prop key="/updateMemberInfo.do">
+					updateMemberInfoController
+				</prop>
+				<prop key="/homepageRegistry.do">
+					homepageRegistryController
+				</prop>
+				<prop key="/registMemberForm.do">
+					registMemberFormController
+				</prop>
+				<prop key="/registMember.do">
+					registMemberController
+				</prop>
+				<prop key="/search">searchController</prop>
+				<prop key="/search/*">
+					searchControllerUsingInternalPath
+				</prop>
+				<prop key="/content/help.htm">
+					comingSoonController
+				</prop>
+				<prop key="/bbs/help.htm">comingSoonController</prop>
+				<prop key="/company/vision.htm">urlController</prop>
+				<prop key="/company/ceo.htm">urlController</prop>
+				<prop key="/submitReport.do">
+					submitReportController
+				</prop>
+				<prop key="/time.do">timeController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="eventExpirationCheckInterceptor"
+		class="kame.spring.chap04.interceptor.EventExpirationCheckInterceptor" />
+	
+	<bean id="handlerMapping3"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="eventExpirationCheckInterceptor"/>
+			</list>
+		</property>
+		<property name="order" value="3" />
+		<property name="alwaysUseFullPath" value="true" />
+		<property name="mappings">
+			<props>
+				<prop key="/event.do">eventController</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean name="registMemberFormController"
+		class="kame.spring.chap04.controller.RegistMemberFormController" />
+
+	<bean name="registMemberController"
+		class="kame.spring.chap04.controller.RegistMemberController">
+		<property name="validators">
+			<list>
+				<ref bean="memberInfoValidator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="memberInfoValidator"
+		class="kame.spring.chap04.controller.MemberInfoValidator" />
+
+	<bean name="contentController"
+		class="kame.spring.chap04.controller.HelloController"
+		p:me="contentController" />
+
+	<bean name="helloController"
+		class="kame.spring.chap04.controller.HelloController"
+		p:me="helloController" />
+
+	<bean name="/content/**/*.htm"
+		class="kame.spring.chap04.controller.HelloController"
+		p:me="/content/**/*.htm" />
+
+	<bean name="/greeting/hello.htm"
+		class="kame.spring.chap04.controller.HelloController"
+		p:me="/greeting/hello.htm" />
+
+	<bean name="/read/hello.htm"
+		class="kame.spring.chap04.controller.HelloController" />
+
+	<bean id="authenticator"
+		class="kame.spring.chap04.controller.MockAuthenticator" />
+
+	<bean name="loginController"
+		class="kame.spring.chap04.controller.LoginController"
+		p:authenticator-ref="authenticator"
+		p:validator-ref="loginCommandValidator"
+		p:commandClass="kame.spring.chap04.controller.LoginCommand"
+		p:commandName="login" p:successView="loginSuccess"
+		p:formView="loginForm" />
+
+	<bean name="loginCommandValidator"
+		class="kame.spring.chap04.controller.LoginCommandValidator" />
+
+	<bean id="memberInfoRetrievalService"
+		class="kame.spring.chap04.controller.MockMemberInfoRetrievalService" />
+
+	<bean id="updateMemberInfoController"
+		class="kame.spring.chap04.controller.UpdateMemberInfoController"
+		p:memberInfoRetrievalService-ref="memberInfoRetrievalService"
+		p:successView="updateMemberInfo" p:formView="updateMemberInfoForm"
+		p:validator-ref="updateMemberInfoValidator" />
+
+	<bean id="updateMemberInfoValidator"
+		class="kame.spring.chap04.controller.UpdateMemberInfoValidator" />
+	
+	<bean id="homepageRegistryController"
+		class="kame.spring.chap04.controller.HomepageRegistryController">
+		<property name="validators">
+			<list>
+				<ref bean="page0Validator" />
+				<ref bean="page1Validator" />
+			</list>
+		</property>
+		<property name="pages">
+			<list>
+				<value>homepageDupCheckForm</value>
+				<value>homepageInputInfoForm</value>
+				<value>homepageConfirmForm</value>
+				<value>homepageRegistryResult</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="page0Validator"
+		class="kame.spring.chap04.controller.HomepageRegistryPage0Validator" />
+
+	<bean id="page1Validator"
+		class="kame.spring.chap04.controller.HomepageRegistryPage1Validator" />
+
+	<bean id="searchController"
+		class="kame.spring.chap04.controller.SearchController"
+		p:methodNameResolver-ref="searchControllerNameResolver"
+		p:internalSearchService-ref="internalSearchService"
+		p:externalSearchService-ref="externalSearchService" />
+
+	<bean id="searchControllerNameResolver"
+		class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+		<property name="paramName" value="mode" />
+	</bean>
+
+	<bean id="searchControllerUsingInternalPath"
+		class="kame.spring.chap04.controller.SearchController"
+		p:methodNameResolver-ref="internalPathNameResolver"
+		p:internalSearchService-ref="internalSearchService"
+		p:externalSearchService-ref="externalSearchService" />
+
+	<bean id="internalPathNameResolver"
+		class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver" />
+
+	<bean id="submitReportController"
+		class="kame.spring.chap04.controller.SubmitReportController"
+		p:formView="submitReportForm" p:successView="submittedReport"
+		p:validator-ref="submitReportValidator" />
+
+	<bean id="submitReportValidator"
+		class="kame.spring.chap04.controller.SubmitReportValidator" />
+
+	<bean id="comingSoonController"
+		class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+		p:viewName="comingSoon" />
+
+	<bean id="timeController"
+		class="kame.spring.chap04.controller.TimeController" />
+
+	<bean id="eventController"
+		class="kame.spring.chap04.controller.EventController" />
+
+	<bean id="urlController"
+		class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>messages.validation</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.Exception">exception</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

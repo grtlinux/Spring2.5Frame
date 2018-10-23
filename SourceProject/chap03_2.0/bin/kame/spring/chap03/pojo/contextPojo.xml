@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<bean id="logging" class="kame.spring.chap03.pojo.LoggingAspect" />
+	<bean id="cache" class="kame.spring.chap03.pojo.CacheAspect" />
+
+	<bean id="writeArticleService"
+		class="kame.spring.chap03.core.WriteArticleServiceImpl" />
+
+	<bean id="readArticleService"
+		class="kame.spring.chap03.core.ReadArticleServiceImpl" />
+
+	<bean id="afterReturnAdvice"
+		class="kame.spring.chap03.api.AfterReturningLogAdvice" />
+
+	<aop:config>
+		<aop:pointcut id="publicMethod"
+			expression="execution(public * kame.spring.chap03.core.*.*(..))" />
+		
+		<aop:advisor advice-ref="afterReturnAdvice" pointcut-ref="publicMethod" />
+		
+		<aop:aspect id="loggingAspect" ref="logging">
+			<aop:before pointcut-ref="publicMethod"
+				method="beforeLogging" />
+			<aop:after-returning pointcut-ref="publicMethod"
+				method="returningLogging" returning="ret" />
+			<aop:after-throwing pointcut-ref="publicMethod"
+				method="throwingLogging" throwing="ex" />
+			<aop:after pointcut-ref="publicMethod"
+				method="afterLogging" />
+		</aop:aspect>
+
+		<aop:aspect id="cacheAspect" ref="cache">
+			<aop:around method="read"
+				pointcut="execution(public * kame.spring.chap03.core.*.readArticle(..))" />
+		</aop:aspect>
+	</aop:config>
+</beans>
