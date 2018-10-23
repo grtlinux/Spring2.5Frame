@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Product">
+	<typeAlias alias="Message" type="kame.spring.guestbook.service.Message" />
+	
+	<parameterMap id="messageParamMap" class="Message">
+		<parameter property="guestName"  />
+	</parameterMap>
+	
+	<resultMap id="messageResultMap" class="Message">
+		<result property="id" column="GUESTBOOK_MESSAGE_ID" />
+		<result property="guestName" column="GUEST_NAME" />
+		<result property="content" column="CONTENT" />
+	</resultMap>
+	
+	<insert id="insert" parameterClass="Message" >
+		insert into GUESTBOOK_MESSAGE (GUEST_NAME, CONTENT) values (#guestName#, #content#)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<select id="selectCount" resultClass="int">
+		select count(*) from GUESTBOOK_MESSAGE
+	</select>
+	
+	<select id="selectList" resultMap="messageResultMap" resultClass="Message"
+		parameterClass="map">
+		select * from GUESTBOOK_MESSAGE 
+		order by GUESTBOOK_MESSAGE_ID desc limit #startRow#, #fetchSize#
+	</select>
+
+</sqlMap>

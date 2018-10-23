@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+       "http://struts.apache.org/dtds/tiles-config_1_1.dtd">
+
+<tiles-definitions>
+
+	<definition name="base_layout"
+		page="/WEB-INF/viewtiles1/template/layout.jsp">
+		<put name="title" value="tiles 연동" />
+		<put name="header"
+			value="/WEB-INF/viewtiles1/template/header.jsp" />
+		<put name="footer"
+			value="/WEB-INF/viewtiles1/template/footer.jsp" />
+	</definition>
+
+	<definition name="hello" extends="base_layout">
+		<put name="body"
+			value="/WEB-INF/viewtiles1/hello.jsp" />
+	</definition>
+
+	<definition name="loginForm" extends="base_layout">
+		<put name="body"
+			value="/WEB-INF/viewtiles1/loginForm.jsp" />
+	</definition>
+
+	<definition name="loginSuccess" extends="base_layout">
+		<put name="body"
+			value="/WEB-INF/viewtiles1/loginSuccess.jsp" />
+	</definition>
+
+	<definition name="registMemberForm" extends="base_layout">
+		<put name="body"
+			value="/WEB-INF/viewtiles1/registMemberForm.jsp" />
+	</definition>
+
+	<definition name="registMember" extends="base_layout">
+		<put name="body"
+			value="/WEB-INF/viewtiles1/registMember.jsp" />
+	</definition>
+
+	<definition name="time" extends="base_layout">
+		<put name="body" value="/WEB-INF/viewtiles1/time.jsp" />
+	</definition>
+
+</tiles-definitions>

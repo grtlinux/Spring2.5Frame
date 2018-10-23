@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<bean id="jotm"
+		class="org.springframework.transaction.jta.JotmFactoryBean" />
+
+	<bean id="transactionManager"
+		class="org.springframework.transaction.jta.JtaTransactionManager"
+		p:userTransaction-ref="jotm" />
+
+	<bean id="billingDataSource"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource">
+			<bean class="org.enhydra.jdbc.standard.StandardXADataSource"
+				destroy-method="shutdown">
+				<property name="transactionManager" ref="jotm" />
+				<property name="driverName"
+					value="com.mysql.jdbc.Driver" />
+				<property name="url"
+					value="jdbc:mysql://localhost/z_billing?useUnicode=true&amp;characterEncoding=euckr" />
+			</bean>
+		</property>
+		<property name="user" value="root" />
+		<property name="password" value="root" />
+	</bean>
+	
+	<bean id="storeDataSource"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource">
+			<bean class="org.enhydra.jdbc.standard.StandardXADataSource"
+				destroy-method="shutdown">
+				<property name="transactionManager" ref="jotm" />
+				<property name="driverName"
+					value="com.mysql.jdbc.Driver" />
+				<property name="url"
+					value="jdbc:mysql://localhost/z_store?useUnicode=true&amp;characterEncoding=euckr" />
+			</bean>
+		</property>
+		<property name="user" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+	<bean id="billingSqlMapClient"
+		class="org.springframework.orm.ibatis.SqlMapClientFactoryBean"
+		p:dataSource-ref="billingDataSource"
+		p:configLocation="WEB-INF/sqlMap/sqlMapConfig.xml" />
+
+	<bean id="storeSqlMapClient"
+		class="org.springframework.orm.ibatis.SqlMapClientFactoryBean"
+		p:dataSource-ref="storeDataSource"
+		p:configLocation="WEB-INF/sqlMap/sqlMapConfig.xml" />
+
+	<bean id="itemDao"
+		class="kame.spring.store.dao.ibatis.IBatisItemDao"
+		p:sqlMapClient-ref="storeSqlMapClient" />
+
+	<bean id="paymentInfoDao"
+		class="kame.spring.store.dao.ibatis.IBatisPaymentInfoDao"
+		p:sqlMapClient-ref="billingSqlMapClient" />
+
+	<bean id="purchaseOrderDao"
+		class="kame.spring.store.dao.ibatis.IBatisPurchaseOrderDao"
+		p:sqlMapClient-ref="storeSqlMapClient" />
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="order" propagation="REQUIRED" />
+			<tx:method name="get" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut
+			expression="execution(public * kame.spring.store.domain.*Service.*(..))"
+			id="servicePublicMethod" />
+		<aop:advisor advice-ref="txAdvice"
+			pointcut-ref="servicePublicMethod" />
+	</aop:config>
+
+	<bean id="placeOrderService"
+		class="kame.spring.store.domain.PlaceOrderServiceImpl"
+		p:itemDao-ref="itemDao" p:paymentInfoDao-ref="paymentInfoDao"
+		p:purchaseOrderDao-ref="purchaseOrderDao" />
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/placeOrder">placeOrderController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="placeOrderController"
+		class="kame.spring.store.controller.PlaceOrderController"
+		p:placeOrderService-ref="placeOrderService"
+		p:commandClass="kame.spring.store.domain.PurchaseOrderRequest"
+		p:formView="placeOrderForm" p:successView="placedOrder" />
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:viewClass="org.springframework.web.servlet.view.JstlView"
+		p:prefix="/WEB-INF/view/" p:suffix=".jsp" />
+
+</beans>

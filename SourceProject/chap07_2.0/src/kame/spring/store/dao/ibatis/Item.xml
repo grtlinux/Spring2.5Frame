@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Item">
+	<typeAlias alias="Item" type="kame.spring.store.domain.Item" />
+	
+	<resultMap id="itemResultMap" class="Item">
+		<result property="id" column="ITEM_ID" />
+		<result property="price" column="PRICE" />
+	</resultMap>
+	
+	<select id="findById" resultMap="itemResultMap" resultClass="Item"
+		parameterClass="java.lang.Integer">
+		select * from ITEM where ITEM_ID = #value# 
+	</select>
+
+</sqlMap>

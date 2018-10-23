@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="connectionFactory"
+		class="org.apache.activemq.ActiveMQConnectionFactory"
+		p:brokerURL="tcp://localhost:61616" />
+
+	<bean id="deliveryCompleteQueue"
+		class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="delivery.complete.queue" />
+	</bean>
+
+	<bean id="messageListenerContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+		p:connectionFactory-ref="connectionFactory"
+		p:destination-ref="deliveryCompleteQueue"
+		p:messageListener-ref="messageListenerAdapter"
+		p:transactionManager-ref="jmsTxManager" />
+
+	<bean id="jmsTxManager"
+		class="org.springframework.jms.connection.JmsTransactionManager"
+		p:connectionFactory-ref="connectionFactory" />
+	
+	<bean id="messageListenerAdapter"
+		class="org.springframework.jms.listener.adapter.MessageListenerAdapter"
+		p:delegate-ref="completeDeliveryListener"
+		p:defaultListenerMethod="listen" />
+	
+	<bean id="completeDeliveryListener"
+		class="kame.spring.express.CompleteDeliveryListener" />
+	
+</beans>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource"
+		p:driverClassName="com.mysql.jdbc.Driver"
+		p:url="jdbc:mysql://localhost/test?useUnicode=true&amp;characterEncoding=euckr"
+		p:username="root" p:password="root" />
+
+	<!-- DriverManagerDataSource를 이용한 설정 예시 -->
+	<!-- 
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		p:driverClassName="com.mysql.jdbc.Driver"
+		p:url="jdbc:mysql://localhost/test?characterEncoding=euckr"
+		p:username="root" p:password="root" />
+	-->
+	
+	<!-- JNDI 기반의 설정 설정 예시 -->
+	<!-- 
+	<jee:jndi-lookup id="dataSource" jndi-name="jdbc/guestbook"
+		resource-ref="true" />
+	
+	<bean id="dataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="jdbc/guestbook" />
+		<property name="resourceRef" value="true" />
+	</bean>
+	-->
+
+</beans>

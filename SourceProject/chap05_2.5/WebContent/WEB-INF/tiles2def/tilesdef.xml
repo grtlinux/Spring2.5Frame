@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+
+	<definition name="base_layout"
+		template="/WEB-INF/viewtiles2/template/layout.jsp">
+		<put-attribute name="header"
+			value="/WEB-INF/viewtiles2/template/header.jsp" />
+		<put-attribute name="footer"
+			value="/WEB-INF/viewtiles2/template/footer.jsp" />
+	</definition>
+
+	<definition name="hello" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/viewtiles2/hello.jsp" />
+	</definition>
+
+	<definition name="loginForm" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/viewtiles2/loginForm.jsp" />
+	</definition>
+
+	<definition name="loginSuccess" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/viewtiles2/loginSuccess.jsp" />
+	</definition>
+
+	<definition name="registMemberForm" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/viewtiles2/registMemberForm.jsp" />
+	</definition>
+
+	<definition name="registMember" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/viewtiles2/registMember.jsp" />
+	</definition>
+
+	<definition name="time" extends="base_layout">
+		<put-attribute name="body" value="/WEB-INF/viewtiles2/time.jsp" />
+	</definition>
+
+</tiles-definitions>

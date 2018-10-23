@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="connectionFactory"
+		class="org.apache.activemq.ActiveMQConnectionFactory"
+		p:brokerURL="tcp://localhost:61616" />
+
+	<bean id="articleQueueDestination"
+		class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="bbs.article.queue" />
+	</bean>
+	
+	<bean id="articleMessageConverter"
+		class="kame.spring.jms.converter.ArticleMessageConverter" />
+	
+	<bean id="jmsTemplate"
+		class="org.springframework.jms.core.JmsTemplate"
+		p:connectionFactory-ref="connectionFactory"
+		p:messageConverter-ref="articleMessageConverter"
+		p:defaultDestination-ref="articleQueueDestination" />
+	
+	<bean id="articleReceiver"
+		class="kame.spring.search.bbs.ArticleMessageReceiver"
+		p:jmsTemplate-ref="jmsTemplate" />
+
+</beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PurchaseOrder">
+	<typeAlias alias="PurchaseOrder" type="kame.spring.store.domain.PurchaseOrder" />
+	
+	<insert id="insert" parameterClass="PurchaseOrder" >
+		insert into PURCHASE_ORDER (ITEM_ID, PAYMENT_INFO_ID, ADDRESS) 
+		values (#itemId#, #paymentInfoId#, #address#)
+		<selectKey resultClass="java.lang.Integer" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+
+</sqlMap>

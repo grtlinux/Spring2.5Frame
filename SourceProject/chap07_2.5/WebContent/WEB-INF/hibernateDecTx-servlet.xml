@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>
+					kame/spring/store/dao/hibernate/Item.hbm.xml
+				</value>
+				<value>
+					kame/spring/store/dao/hibernate/PaymentInfo.hbm.xml
+				</value>
+				<value>
+					kame/spring/store/dao/hibernate/PurchaseOrder.hbm.xml
+				</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLInnoDBDialect
+				</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="itemDao"
+		class="kame.spring.store.dao.hibernate.HibernateItemDao"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<bean id="paymentInfoDao"
+		class="kame.spring.store.dao.hibernate.HibernatePaymentInfoDao"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<bean id="purchaseOrderDao"
+		class="kame.spring.store.dao.hibernate.HibernatePurchaseOrderDao"
+		p:sessionFactory-ref="sessionFactory" />
+
+	<bean id="placeOrderService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="target">
+			<bean class="kame.spring.store.domain.PlaceOrderServiceImpl"
+				p:itemDao-ref="itemDao" p:paymentInfoDao-ref="paymentInfoDao"
+				p:purchaseOrderDao-ref="purchaseOrderDao" />
+		</property>
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="order">PROPAGATION_REQUIRED</prop>
+				<prop key="get">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/placeOrder">placeOrderController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="placeOrderController"
+		class="kame.spring.store.controller.PlaceOrderController"
+		p:placeOrderService-ref="placeOrderService"
+		p:commandClass="kame.spring.store.domain.PurchaseOrderRequest"
+		p:formView="placeOrderForm" p:successView="placedOrder" />
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:viewClass="org.springframework.web.servlet.view.JstlView"
+		p:prefix="/WEB-INF/view/" p:suffix=".jsp" />
+
+</beans>

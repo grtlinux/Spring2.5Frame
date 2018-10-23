@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/file">downloadController</prop>
+				<prop key="/pageRanks">pageRanksController</prop>
+				<prop key="/pageReport">pageReportController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="downloadController"
+		class="kame.spring.chap05.controller.DownloadController" />
+	
+	<bean id="pageRanksController"
+		class="kame.spring.chap05.controller.PageRanksController" />
+	
+	<bean id="pageReportController"
+		class="kame.spring.chap05.controller.PageReportController" />
+	
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+	
+	<bean id="download"
+		class="kame.spring.chap05.view.DownloadView" />
+
+	<bean id="pageRanks"
+		class="kame.spring.chap05.view.PageRanksView" />
+	
+	<bean id="pageReport"
+		class="kame.spring.chap05.view.PageReportView" />
+</beans>

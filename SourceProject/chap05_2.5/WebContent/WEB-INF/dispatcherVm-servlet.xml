@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/greeting/hello.htm">helloController</prop>
+				<prop key="/login.do">loginController</prop>
+				<prop key="/time.do">timeController</prop>
+				<prop key="/registMember.do">registMemberController</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="timeController"
+		class="kame.spring.chap05.controller.TimeController" />
+
+	<bean name="helloController"
+		class="kame.spring.chap05.controller.HelloController"
+		p:me="helloController" />
+
+	<bean id="authenticator"
+		class="kame.spring.chap05.controller.MockAuthenticator" />
+
+	<bean name="loginController"
+		class="kame.spring.chap05.controller.LoginController"
+		p:authenticator-ref="authenticator"
+		p:validator-ref="loginCommandValidator"
+		p:commandClass="kame.spring.chap05.controller.LoginCommand"
+		p:commandName="login" p:successView="loginSuccess"
+		p:formView="loginForm" />
+
+	<bean name="loginCommandValidator"
+		class="kame.spring.chap05.controller.LoginCommandValidator" />
+
+	<bean name="registMemberController"
+		class="kame.spring.chap05.controller.RegistMemberForVelocityController"
+		p:formView="registMemberForm"
+		p:successView="registMember"
+		p:validator-ref="memberInfoValidator" />
+	
+	<bean id="memberInfoValidator"
+		class="kame.spring.chap05.controller.MemberInfoValidator" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>messages.validation</value>
+				<value>messages.label</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="velocityConfigurer"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/viewvm/" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">EUC-KR</prop>
+				<prop key="output.encoding">EUC-KR</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.velocity.VelocityViewResolver"
+		p:suffix=".vm"
+		p:contentType="text/html; charset=EUC-KR"
+		p:dateToolAttribute="dateTool"
+		p:numberToolAttribute="numberTool"
+		p:exposeRequestAttributes="true"
+		p:exposeSessionAttributes="true" />
+
+</beans>

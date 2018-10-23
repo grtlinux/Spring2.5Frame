@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="connectionFactory"
+		class="org.apache.activemq.ActiveMQConnectionFactory"
+		p:brokerURL="tcp://localhost:61616" />
+
+	<bean id="deliveryCompleteQueue"
+		class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="delivery.complete.queue" />
+	</bean>
+
+	<bean id="jmsTemplate"
+		class="org.springframework.jms.core.JmsTemplate"
+		p:connectionFactory-ref="connectionFactory"
+		p:defaultDestination-ref="deliveryCompleteQueue" />
+
+	<bean id="jmsTxManager"
+		class="org.springframework.jms.connection.JmsTransactionManager"
+		p:connectionFactory-ref="connectionFactory" />
+
+	<tx:advice id="txAdvice" transaction-manager="jmsTxManager">
+		<tx:attributes>
+			<tx:method name="complete" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:advisor advice-ref="txAdvice"
+			pointcut="execution(public void complete(..))" />
+	</aop:config>
+
+	<bean id="completeDeliveryService"
+		class="kame.spring.express.CompleteDeliveryServiceImpl"
+		p:jmsTemplate-ref="jmsTemplate" />
+
+</beans>

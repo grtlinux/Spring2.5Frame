@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="registrationService"
+		class="kame.spring.bbs.domain.service.RegistrationServiceImpl" />
+
+	<bean
+		class="kame.spring.bbs.domain.notification.RegistrationNotifierWithSimple"
+		p:mailSender-ref="mailSender"
+		p:templateMailMessage-ref="templateMailMessage" />
+
+	<bean
+		class="kame.spring.bbs.domain.notification.RegistrationNotifierWithMime"
+		p:mailSender-ref="mailSender" />
+
+	<bean
+		class="kame.spring.bbs.domain.notification.RegistrationNotifierWithAttachment"
+		p:mailSender-ref="mailSender" />
+
+	<bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl"
+		p:host="localhost" p:defaultEncoding="euc-kr" />
+
+	<bean id="templateMailMessage"
+		class="org.springframework.mail.SimpleMailMessage"
+		p:from="noreply@madvirus.net" p:subject="회원 가입을 환영합니다." />
+
+</beans>

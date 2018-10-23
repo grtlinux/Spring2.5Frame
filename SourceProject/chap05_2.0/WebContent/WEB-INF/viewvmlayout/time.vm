@@ -1,0 +1,2 @@
+#springMessage("label.currentTime")
+: $dateTool.format("yyyy-MM-dd HH:mm:ss", $time)
